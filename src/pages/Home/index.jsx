@@ -1,34 +1,45 @@
+import { useEffect, useState, useRef } from 'react';
 import './style.css'
 import { FaRegTrashAlt } from "react-icons/fa";
+import api from "../../services/api"
 
 function Home() {
 
-  const usuarios = [
-    {
-      id: '123423sdf332d3kl23jh4323',
-      name: 'Henrique',
-      age: 26,
-      email: 'henrique@email.com'
-    },
-    {
-      id: 'hfj23h4j23dfsd902d',
-      name: 'Teste',
-      age: 33,
-      email: 'teste@email.com'
+  const [users, setUsers] = useState([])
+  
+  const inputName = useRef()
+  const inputAge = useRef()
+  const inputEmail = useRef()
+
+  async function getUsers(){
+    const responseApi = await api.get('/usuarios')
+    setUsers(responseApi.data)
+  }
+  
+  async function createUsers(){
+    const body = {
+      name: inputName.current.value,
+      age: inputAge.current.value,
+      email: inputEmail.current.value
     }
-  ]
+    await api.post('/usuarios', body)
+  }
+
+  useEffect(()=>{
+    getUsers()
+  },[])
 
   return (
     <div className='container'>
       <form>
         <h1>Cadastro de usuários</h1>
-        <input name='nome' type='text' placeholder='Nome'/>
-        <input name='idade' type='number' placeholder='Idade'/>
-        <input name='email' type='email' placeholder='E-mail'/>
-        <button type='button'>Cadastrar</button>
+        <input name='nome' type='text' placeholder='Nome' ref={inputName}/>
+        <input name='idade' type='number' placeholder='Idade'ref={inputAge}/>
+        <input name='email' type='email' placeholder='E-mail'ref={inputEmail}/>
+        <button type='button' onClick={createUsers}>Cadastrar</button>
       </form>
       {
-        usuarios.map(usuario => (
+        users.map(usuario => (
           <div key={usuario.id} className='userCard'>
             <div>
               <p>Nome: <span>{usuario.name}</span></p>
